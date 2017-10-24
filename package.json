@@ -1,6 +1,6 @@
 {
   "name": "simple-dynamodb-sdk",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "DynamoDB SDK done right",
   "main": "dynamodb.js",
   "private": true,

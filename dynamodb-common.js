@@ -184,7 +184,7 @@ function filterExpression(attributes, joinCondition) {
             jc = this._joinCondition;
         }
     
-        let result = common.makeConditionExpression(attributes, jc, this._filterExpression, this._attributeValues);
+        let result = makeConditionExpression(attributes, jc, this._filterExpression, this._attributeValues);
         
         this._filterExpression = result.conditionExpression;
         this._attributeValues = result.attributeValues;
