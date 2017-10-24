@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "DynamoDB SDK done right",
   "main": "dynamodb.js",
+  "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
