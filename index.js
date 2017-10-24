@@ -34,4 +34,15 @@ function testGet() {
         });  
 }
 
-testQuery();
+function testScan() {
+    let db = new SimpleDB(config);
+
+    return db.scan()
+        .tableName('Tinker-NearNet-dev.Chat.Message')
+        .run()
+        .then(result => {
+            console.log(result);
+        });  
+}
+
+testScan();

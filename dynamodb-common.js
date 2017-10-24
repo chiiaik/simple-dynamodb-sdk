@@ -172,6 +172,48 @@ function makeConditionExpression(attributes, joinCondition, initialConditionExpr
     return { conditionExpression: conditionExpression.expression, attributeValues: conditionExpression.attributeValues };
 }
 
+/**
+ * Specify the fileter expression
+ * @param {array} attributes Array of expression attributes, e.g. { name: 'userId', value: '123', condition: '='}
+ * @param {string} joinOperator If multiple attributes are present, join operator is required ['AND'|'OR']
+ */
+function filterExpression(attributes, joinCondition) {
+    
+        let jc = joinCondition;
+        if (_.isEmpty(jc)) {
+            jc = this._joinCondition;
+        }
+    
+        let result = common.makeConditionExpression(attributes, jc, this._filterExpression, this._attributeValues);
+        
+        this._filterExpression = result.conditionExpression;
+        this._attributeValues = result.attributeValues;
+    
+        return this;
+}
+    
+/**
+ * Specify the projection expression
+ * @param {array} attributes Array of attributes, e.g. ['userId','firstName', ...]
+ */
+function projectionExpression(attributes) {
+    if (_.isNil(attributes)) {
+        return this;
+    }
+
+    this._projectionExpression = attributes.reduce((acc, attribute) => {
+        let expression = attribute + ',';
+        if (_.isEmpty(acc)) {
+            return expression;
+        }
+        else {
+            return acc + ' ' + expression;
+        }
+    }, this._projectionExpression).replace(/,\s*$/, '');
+
+    return this;
+}
+
 function isComparator(operator) {
     switch (operator) {
         case '<':
@@ -199,6 +241,9 @@ function and() {
 module.exports = {
     tableName,
     indexName,
+    filter: filterExpression,
+    select: projectionExpression, 
+    projection: projectionExpression,
     makeAttributeContainsExpression,
     makeAttributeExistsOrNotExistsExpression,
     makeAttributeSizeExpression,
