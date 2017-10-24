@@ -1,0 +1,26 @@
+{
+  "name": "simple-dynamodb-sdk",
+  "version": "0.0.1",
+  "description": "DynamoDB SDK done right",
+  "main": "dynamodb.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/renaldonoma/simple-dynamodb-sdk.git"
+  },
+  "author": "Renaldo Noma",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/renaldonoma/simple-dynamodb-sdk/issues"
+  },
+  "homepage": "https://github.com/renaldonoma/simple-dynamodb-sdk#readme",
+  "dependencies": {
+    "dynamodb-helper": "git+https://github.com/renaldonoma/dynamodb-helper-js.git",
+    "lodash": "^4.17.4"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.139.0"
+  }
+}
