@@ -228,6 +228,148 @@ function isComparator(operator) {
     }
 }
 
+function attributeValueEqualTo(name, value, joinCondition) {
+    return this.filter([{
+        name,
+        value,
+        operator: '='
+    }], joinCondition);
+}
+
+function attributeValueNotEqualTo(name, value, joinCondition) {
+    return this.filter([{
+        name,
+        value,
+        operator: '<>'
+    }], joinCondition);
+}
+
+function attributeValueLessThan(name, value, joinCondition) {
+    return this.filter([{
+        name,
+        value,
+        operator: '<'
+    }], joinCondition);
+}
+
+function attributeValueGreaterThan(name, value, joinCondition) {
+    return this.filter([{
+        name,
+        value,
+        operator: '>'
+    }], joinCondition);
+}
+
+function attributeValueLessThanOrEqualTo(name, value, joinCondition) {
+    return this.filter([{
+        name,
+        value,
+        operator: '<='
+    }], joinCondition);
+}
+
+function attributeValueGreaterThanOrEqualTo(name, value, joinCondition) {
+    return this.filter([{
+        name,
+        value,
+        operator: '>='
+    }], joinCondition);
+}
+
+function attributeValueBetween(name, lower, upper, joinCondition) {
+    return this.filter([{
+        name,
+        values: [lower, upper],
+        operator: 'BETWEEN',
+    }], joinCondition);
+}
+
+function attributeValueIn(name, values, joinCondition) {
+    return this.filter([{
+        name,
+        values,
+        operator: 'IN',
+    }], joinCondition);
+}
+
+function attributeExists(name, joinCondition) {
+    return this.filter([{
+        name,
+        operator: 'attribute_exists',
+    }], joinCondition);
+}
+
+function attributeNotExists(name, joinCondition) {
+    return this.filter([{
+        name,
+        operator: 'attribute_not_exists',
+    }], joinCondition);
+}
+
+function attributeBeginsWith(name, value, joinCondition) {
+    return this.filter([{
+        name,
+        value,
+        operator: 'begins_with',
+    }], joinCondition);
+}
+
+function attributeContains(name, value, joinCondition) {
+    return this.filter([{
+        name,
+        value,
+        operator: 'contains',
+    }], joinCondition);
+}
+
+function attributeSizeEqualTo(name, value, joinCondition) {
+    return this.filter([{
+        name,
+        operator: 'size',
+        comparator: '=',
+    }], joinCondition);
+}
+
+function attributeSizeLessThan(name, value, joinCondition) {
+    return this.filter([{
+        name,
+        operator: 'size',
+        comparator: '<',
+    }], joinCondition);
+}
+
+function attributeSizeGreaterThan(name, value, joinCondition) {
+    return this.filter([{
+        name,
+        operator: 'size',
+        comparator: '>',
+    }], joinCondition);
+}
+
+function attributeSizeLessThanOrEqualTo(name, value, joinCondition) {
+    return this.filter([{
+        name,
+        operator: 'size',
+        comparator: '<=',
+    }], joinCondition);
+}
+
+function attributeSizeGreaterThanOrEqualTo(name, value, joinCondition) {
+    return this.filter([{
+        name,
+        operator: 'size',
+        comparator: '>=',
+    }], joinCondition);
+}
+
+function attributeSizeNotEqualTo(name, value, joinCondition) {
+    return this.filter([{
+        name,
+        operator: 'size',
+        comparator: '<>',
+    }], joinCondition);
+}
+
 function or() {
     this._joinCondition = 'OR';
     return this;
@@ -255,5 +397,24 @@ module.exports = {
     makeInExpression,
     isComparator,
     and,
-    or
+    or,
+    /* Attribute Filters */
+    attributeBeginsWith,
+    attributeContains,
+    attributeExists,
+    attributeNotExists,
+    attributeSizeEqualTo,
+    attributeSizeGreaterThan,
+    attributeSizeGreaterThanOrEqualTo,
+    attributeSizeLessThan,
+    attributeSizeLessThanOrEqualTo,
+    attributeSizeNotEqualTo,
+    attributeValueBetween,
+    attributeValueEqualTo,
+    attributeValueGreaterThan,
+    attributeValueGreaterThanOrEqualTo,
+    attributeValueLessThan,
+    attributeValueLessThanOrEqualTo,
+    attributeValueNotEqualTo,
+    attributeValueIn,
 }
