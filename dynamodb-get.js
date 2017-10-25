@@ -52,8 +52,8 @@ function run() {
 
 function dryRun() {
     let params = _makeGetParams(this);
-    console.log(params);    
-    return Promise.resolve();    
+    // console.log(params);    
+    return Promise.resolve(params);    
 }
 
 module.exports = {

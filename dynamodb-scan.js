@@ -1,33 +1,12 @@
 const _ = require('lodash');
+const common = require('./dynamodb-common');
 
 
 
 function _makeParams(self) {
-    let params = {};
-    params.TableName = self._tableName;
-    if (self._indexName) {
-        params.IndexName = self._indexName;
-    }
+    let params = common.makeParams(self);
 
-    if (self._projectionExpression) {
-        params.ProjectionExpression = self._projectionExpression;
-    }   
-
-    if (self._filterExpression) {
-        params.FilterExpression = self._filterExpression;
-    }
-
-    if (self._attributeNames) {
-        params.ExpressionAttributeNames = self._attributeNames;
-    } 
-
-    if (self._attributeValues) {
-        params.ExpressionAttributeValues = self._attributeValues;
-    }  
-
-    if (self._consistentRead) {
-        params.ConsistentRead = self._consistentRead;
-    }
+    
 
     return params;
 }
@@ -39,8 +18,8 @@ function run() {
 
 function dryRun() {
     let params = _makeParams(this);
-    console.log(params);    
-    return Promise.resolve();    
+    // console.log(params);    
+    return Promise.resolve(params);    
 }
 
 module.exports = {

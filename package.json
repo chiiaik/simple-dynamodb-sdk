@@ -5,7 +5,7 @@
   "main": "dynamodb.js",
   "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha test/**/*.test.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +22,7 @@
     "lodash": "^4.17.4"
   },
   "devDependencies": {
-    "aws-sdk": "^2.139.0"
+    "aws-sdk": "^2.139.0",
+    "chai": "^4.1.2"
   }
 }

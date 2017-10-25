@@ -39,7 +39,9 @@ function testScan() {
 
     return db.scan()
         .tableName('Tinker-NearNet-dev.Chat.Message')
-        .attributeValueEqualTo('messageId', 'abc')
+        .attribute('messageId').lessThan('abc')
+        .or()
+        .attribute('userId').greaterThan('xyz')
         .isConsistentRead()
         .dryRun()
         .then(result => {
