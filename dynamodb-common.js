@@ -228,6 +228,11 @@ function isComparator(operator) {
     }
 }
 
+function isConsistentRead() {
+    this._consistentRead = true;
+    return this;
+}
+
 function attributeValueEqualTo(name, value, joinCondition) {
     return this.filter([{
         name,
@@ -398,6 +403,8 @@ module.exports = {
     isComparator,
     and,
     or,
+    isConsistentRead,
+    
     /* Attribute Filters */
     attributeBeginsWith,
     attributeContains,

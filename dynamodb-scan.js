@@ -1,5 +1,7 @@
 const _ = require('lodash');
 
+
+
 function _makeParams(self) {
     let params = {};
     params.TableName = self._tableName;
@@ -18,11 +20,14 @@ function _makeParams(self) {
     if (self._attributeNames) {
         params.ExpressionAttributeNames = self._attributeNames;
     } 
-    
+
     if (self._attributeValues) {
         params.ExpressionAttributeValues = self._attributeValues;
     }  
 
+    if (self._consistentRead) {
+        params.ConsistentRead = self._consistentRead;
+    }
 
     return params;
 }

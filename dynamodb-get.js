@@ -13,10 +13,6 @@ function sortKey(keyName, value) {
     return this;
 }
 
-function isConsistentRead() {
-    this._consistentRead = true;
-    return this;
-}
 
 function _makeGetParams(self) {
     let params = {};
@@ -63,7 +59,6 @@ function dryRun() {
 module.exports = {
     primaryKey,
     sortKey,
-    isConsistentRead,
     run,
     dryRun,
 }
