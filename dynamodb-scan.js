@@ -15,6 +15,15 @@ function _makeParams(self) {
         params.FilterExpression = self._filterExpression;
     }
 
+    if (self._attributeNames) {
+        params.ExpressionAttributeNames = self._attributeNames;
+    } 
+    
+    if (self._attributeValues) {
+        params.ExpressionAttributeValues = self._attributeValues;
+    }  
+
+
     return params;
 }
 
