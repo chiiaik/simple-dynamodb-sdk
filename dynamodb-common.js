@@ -189,9 +189,33 @@ function filterExpression(attributes, joinCondition) {
         jc = 'AND';
     }
     
-    let result = makeConditionExpression(this, attributes, jc, this._filterExpression, this._attributeValues);
+    let result = makeConditionExpression(this, attributes, jc, this._paramFilterExpression, this._attributeValues);
     
-    this._filterExpression = result.conditionExpression;
+    this._paramFilterExpression = result.conditionExpression;
+    this._attributeValues = result.attributeValues;
+
+    return this;
+}
+
+/**
+ * Specify the fileter expression
+ * @param {array} attributes Array of expression attributes, e.g. { name: 'userId', value: '123', condition: '='}
+ * @param {string} joinOperator If multiple attributes are present, join operator is required ['AND'|'OR']
+ */
+function conditionExpression(attributes, joinCondition) {
+    
+    let jc = joinCondition;
+    if (_.isEmpty(jc)) {
+        jc = this._joinCondition;
+    }
+
+    if (_.isEmpty(jc)) {
+        jc = 'AND';
+    }
+    
+    let result = makeConditionExpression(this, attributes, jc, this._paramConditionExpression, this._attributeValues);
+    
+    this._paramConditionExpression = result.conditionExpression;
     this._attributeValues = result.attributeValues;
 
     return this;
@@ -207,11 +231,11 @@ function projectionExpression(attributes) {
     }
 
     if (_.isString(attributes)) {
-        this._projectionExpression = attributes;
+        this._paramProjectionExpression = attributes;
         return this;
     }
 
-    this._projectionExpression = attributes.reduce((acc, attribute) => {
+    this._paramProjectionExpression = attributes.reduce((acc, attribute) => {
         let expression = attribute + ',';
         if (_.isEmpty(acc)) {
             return expression;
@@ -219,7 +243,7 @@ function projectionExpression(attributes) {
         else {
             return acc + ' ' + expression;
         }
-    }, this._projectionExpression).replace(/,\s*$/, '');
+    }, this._paramProjectionExpression).replace(/,\s*$/, '');
 
     return this;
 }
@@ -277,30 +301,34 @@ function limit(number) {
  * @param {String} name Name of the attribute
  */
 function attribute(name) {
-    this.equal = attributeValueComparatorOperation(this, name, '=');
-    this.notEqual = attributeValueComparatorOperation(this, name, '<>');
-    this.lessThan = attributeValueComparatorOperation(this, name, '<');
-    this.greaterThan = attributeValueComparatorOperation(this, name, '>');    
-    this.lessThanOrEqual = attributeValueComparatorOperation(this, name, '<=');
-    this.greaterThanOrEqual = attributeValueComparatorOperation(this, name, '>=');
-    this.between = attributeValueBetweenOperation(this, name, 'BETWEEN');
-    this.in = attributeValueInOperation(this, name, 'IN');
-    this.exists = attributeValueComparatorOperation(this, name, null, 'attribute_exists');
-    this.notExists = attributeValueComparatorOperation(this, name, null, 'attribute_not_exists');
-    this.beginsWith = attributeValueComparatorOperation(this, name, null, 'begins_with');
-    this.contains = attributeValueComparatorOperation(this, name, null, 'contains');
-    this.size = size(this, name);
-    return this;
+    return _attribute(this, this.filter.bind(this), name);
 }
 
-function size(self, name) {
+function _attribute(self, expressionFunction, name) {
+    self.equal = _attributeValueComparatorOperation(expressionFunction, name, '=');
+    self.notEqual = _attributeValueComparatorOperation(expressionFunction, name, '<>');
+    self.lessThan = _attributeValueComparatorOperation(expressionFunction, name, '<');
+    self.greaterThan = _attributeValueComparatorOperation(expressionFunction, name, '>');    
+    self.lessThanOrEqual = _attributeValueComparatorOperation(expressionFunction, name, '<=');
+    self.greaterThanOrEqual = _attributeValueComparatorOperation(expressionFunction, name, '>=');
+    self.between = _attributeValueBetweenOperation(expressionFunction, name, 'BETWEEN');
+    self.in = _attributeValueInOperation(expressionFunction, name, 'IN');
+    self.exists = _attributeValueComparatorOperation(expressionFunction, name, null, 'attribute_exists');
+    self.notExists = _attributeValueComparatorOperation(expressionFunction, name, null, 'attribute_not_exists');
+    self.beginsWith = _attributeValueComparatorOperation(expressionFunction, name, null, 'begins_with');
+    self.contains = _attributeValueComparatorOperation(expressionFunction, name, null, 'contains');
+    self.size = _size(self, expressionFunction, name);
+    return self;
+}
+
+function _size(self, expressionFunction, name) {
     return () => {
-        self.equal = attributeValueComparatorOperation(self, name, '=', 'size');
-        self.notEqual = attributeValueComparatorOperation(self, name, '<>', 'size');
-        self.lessThan = attributeValueComparatorOperation(self, name, '<', 'size');
-        self.greaterThan = attributeValueComparatorOperation(self, name, '>', 'size');
-        self.lessThanOrEqual = attributeValueComparatorOperation(self, name, '<=', 'size');
-        self.greaterThanOrEqual = attributeValueComparatorOperation(self, name, '>=', 'size');
+        self.equal = _attributeValueComparatorOperation(expressionFunction, name, '=', 'size');
+        self.notEqual = _attributeValueComparatorOperation(expressionFunction, name, '<>', 'size');
+        self.lessThan = _attributeValueComparatorOperation(expressionFunction, name, '<', 'size');
+        self.greaterThan = _attributeValueComparatorOperation(expressionFunction, name, '>', 'size');
+        self.lessThanOrEqual = _attributeValueComparatorOperation(expressionFunction, name, '<=', 'size');
+        self.greaterThanOrEqual = _attributeValueComparatorOperation(expressionFunction, name, '>=', 'size');
 
         delete self.size;
         delete self.exists;
@@ -313,9 +341,9 @@ function size(self, name) {
 }
 
 
-function attributeValueComparatorOperation(self, name, comparator, func, joinCondition) {
+function _attributeValueComparatorOperation(expressionFunction, name, comparator, func, joinCondition) {
     return (value) => {
-        return self.filter([{
+        return expressionFunction([{
             name,
             value,
             func,
@@ -324,9 +352,9 @@ function attributeValueComparatorOperation(self, name, comparator, func, joinCon
     }    
 }
 
-function attributeValueBetweenOperation(self, name, comparator, joinCondition) {
+function _attributeValueBetweenOperation(expressionFunction, name, comparator, joinCondition) {
     return (lower, upper) => {
-        return self.filter([{
+        return expressionFunction([{
             name,
             values: [lower, upper],
             comparator
@@ -334,9 +362,9 @@ function attributeValueBetweenOperation(self, name, comparator, joinCondition) {
     }    
 }
 
-function attributeValueInOperation(self, name, comparator, func, joinCondition) {
+function _attributeValueInOperation(expressionFunction, name, comparator, func, joinCondition) {
     return (values) => {
-        return self.filter([{
+        return expressionFunction([{
             name,
             values,
             func,
@@ -345,154 +373,6 @@ function attributeValueInOperation(self, name, comparator, func, joinCondition) 
     }    
 }
 
-
-
-function attributeValueEqualTo(name, value, joinCondition) {
-    return this.filter([{
-        name,
-        value,
-        comparator: '='
-    }], joinCondition);
-}
-
-function attributeValueNotEqualTo(name, value, joinCondition) {
-    return this.filter([{
-        name,
-        value,
-        comparator: '<>'
-    }], joinCondition);
-}
-
-function attributeValueLessThan(name, value, joinCondition) {
-    return this.filter([{
-        name,
-        value,
-        comparator: '<'
-    }], joinCondition);
-}
-
-function attributeValueGreaterThan(name, value, joinCondition) {
-    return this.filter([{
-        name,
-        value,
-        comparator: '>'
-    }], joinCondition);
-}
-
-function attributeValueLessThanOrEqualTo(name, value, joinCondition) {
-    return this.filter([{
-        name,
-        value,
-        comparator: '<='
-    }], joinCondition);
-}
-
-function attributeValueGreaterThanOrEqualTo(name, value, joinCondition) {
-    return this.filter([{
-        name,
-        value,
-        comparator: '>='
-    }], joinCondition);
-}
-
-function attributeValueBetween(name, lower, upper, joinCondition) {
-    return this.filter([{
-        name,
-        values: [lower, upper],
-        comparator: 'BETWEEN',
-    }], joinCondition);
-}
-
-function attributeValueIn(name, values, joinCondition) {
-    return this.filter([{
-        name,
-        values,
-        comparator: 'IN',
-    }], joinCondition);
-}
-
-function attributeExists(name, joinCondition) {
-    return this.filter([{
-        name,
-        func: 'attribute_exists',
-    }], joinCondition);
-}
-
-function attributeNotExists(name, joinCondition) {
-    return this.filter([{
-        name,
-        func: 'attribute_not_exists',
-    }], joinCondition);
-}
-
-function attributeBeginsWith(name, value, joinCondition) {
-    return this.filter([{
-        name,
-        value,
-        func: 'begins_with',
-    }], joinCondition);
-}
-
-function attributeContains(name, value, joinCondition) {
-    return this.filter([{
-        name,
-        value,
-        func: 'contains',
-    }], joinCondition);
-}
-
-function attributeSizeEqualTo(name, value, joinCondition) {
-    return this.filter([{
-        name,
-        value,        
-        func: 'size',
-        comparator: '=',
-    }], joinCondition);
-}
-
-function attributeSizeLessThan(name, value, joinCondition) {
-    return this.filter([{
-        name,
-        value,        
-        func: 'size',
-        comparator: '<',
-    }], joinCondition);
-}
-
-function attributeSizeGreaterThan(name, value, joinCondition) {
-    return this.filter([{
-        name,
-        value,        
-        func: 'size',
-        comparator: '>',
-    }], joinCondition);
-}
-
-function attributeSizeLessThanOrEqualTo(name, value, joinCondition) {
-    return this.filter([{
-        name,
-        func: 'size',
-        comparator: '<=',
-    }], joinCondition);
-}
-
-function attributeSizeGreaterThanOrEqualTo(name, value, joinCondition) {
-    return this.filter([{
-        name,
-        value,        
-        func: 'size',
-        comparator: '>=',
-    }], joinCondition);
-}
-
-function attributeSizeNotEqualTo(name, value, joinCondition) {
-    return this.filter([{
-        name,
-        value,        
-        func: 'size',
-        comparator: '<>',
-    }], joinCondition);
-}
 
 function or() {
     this._joinCondition = 'OR';
@@ -504,6 +384,48 @@ function and() {
     return this;
 }
 
+/**
+ * 
+ * @param {String} val 'NONE' | 'ALL_OLD' | 'UPDATED_OLD' | 'ALL_NEW' | 'UPDATED_NEW'
+ */
+function returnValues(val) {
+    if (_.isEmpty(val)) {
+        this.allOld = () => _returnValues(this, 'ALL_OLD');
+        this.allNew = () => _returnValues(this, 'ALL_NEW');
+        this.updatedOld = () => _returnValues(this, 'UPDATED_OLD');
+        this.updatedNew = () => _returnValues(this, 'UPDATED_NEW');
+        return this;
+    }
+
+    return _returnValues(this, val);
+}
+
+function _returnValues(self, val) {
+    self._paramReturnValues = val;
+    return self;
+}
+
+function returnAllOldValues() {
+    return _returnValues(this,'ALL_OLD');
+}   
+
+function returnUpdatedOldValues() {
+    return _returnValues(this,'UPDATED_OLD');
+}
+
+function returnAllNewvalues() {
+    return _returnValues(this,'ALL_NEW');    
+}
+
+function returnUpdatedNewValues() {
+    return _returnValues(this,'UPDATED_NEW');    
+}
+
+function returnItemCollectionMetrics() {
+    this._paramReturnItemCollectionMetrics = 'SIZE';
+    return this;
+}
+
 function makeParams(self) {
     let params = {};
     params.TableName = self._tableName;
@@ -511,7 +433,6 @@ function makeParams(self) {
         params.IndexName = self._indexName;
     }
 
-  
 
     // if (self._attributeNames) {
     //     params.ExpressionAttributeNames = self._attributeNames;
@@ -521,12 +442,16 @@ function makeParams(self) {
         params.ExpressionAttributeValues = self._attributeValues;
     }    
 
-    if (self._projectionExpression) {
-        params.ProjectionExpression = self._projectionExpression;
+    if (self._paramProjectionExpression) {
+        params.ProjectionExpression = self._paramProjectionExpression;
     }    
 
-    if (self._filterExpression) {
-        params.FilterExpression = self._filterExpression;
+    if (self._paramConditionExpression) {
+        params.ConditionExpression = self._paramConditionExpression;    
+    }
+
+    if (self._paramFilterExpression) {
+        params.FilterExpression = self._paramFilterExpression;
     }
 
     if (!_.isNil(self._consistentRead)) {
@@ -535,6 +460,14 @@ function makeParams(self) {
 
     if (self._returnedConsumedCapacity) {
         params.ReturnConsumedCapacity = self._returnedConsumedCapacity;
+    }
+
+    if (self._paramReturnValues) {
+        params.ReturnValues = self._paramReturnValues;
+    }
+
+    if (self._paramReturnItemCollectionMetrics) {
+        params.ReturnItemCollectionMetrics = self._paramReturnItemCollectionMetrics;
     }
 
     if (!_.isNil(self._paramLimit)) {
@@ -551,6 +484,7 @@ module.exports = {
     filter: filterExpression,
     select: projectionExpression, 
     projection: projectionExpression,
+    condition: conditionExpression,
     makeAttributeContainsExpression,
     makeAttributeExistsOrNotExistsExpression,
     makeAttributeSizeExpression,
@@ -568,22 +502,13 @@ module.exports = {
 
     /* Attribute Filters */
     attribute,
-    attributeBeginsWith,
-    attributeContains,
-    attributeExists,
-    attributeNotExists,
-    attributeSizeEqualTo,
-    attributeSizeGreaterThan,
-    attributeSizeGreaterThanOrEqualTo,
-    attributeSizeLessThan,
-    attributeSizeLessThanOrEqualTo,
-    attributeSizeNotEqualTo,
-    attributeValueBetween,
-    attributeValueEqualTo,
-    attributeValueGreaterThan,
-    attributeValueGreaterThanOrEqualTo,
-    attributeValueLessThan,
-    attributeValueLessThanOrEqualTo,
-    attributeValueNotEqualTo,
-    attributeValueIn,
+    _attribute,
+
+    returnValues,
+    returnAllNewvalues,
+    returnAllOldValues,
+    returnUpdatedNewValues,
+    returnUpdatedOldValues,
+
+    returnItemCollectionMetrics
 }

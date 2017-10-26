@@ -2,6 +2,7 @@ const DynamoDBHelper = require('dynamodb-helper');
 const dbquery = require('./dynamodb-query');
 const dbget = require('./dynamodb-get');
 const dbscan = require('./dynamodb-scan');
+const dbput = require('./dynamodb-put');
 const common = require('./dynamodb-common');
 const _ = require('lodash');
 
@@ -31,6 +32,14 @@ function scan() {
     return retval;
 }
 
+function put() {
+    let retval = {};
+    Object.assign(retval, common);
+    Object.assign(retval, dbput);
+    retval._db = new DynamoDBHelper(this.config);
+    return retval;
+}
+
 function DynamoDB(config) {
     if (_.isEmpty(config)) {
         throw new Error('missing config');
@@ -41,7 +50,8 @@ function DynamoDB(config) {
 DynamoDB.prototype = {
     query,
     get,
-    scan
+    scan,
+    put
 }
 
 module.exports = DynamoDB;
