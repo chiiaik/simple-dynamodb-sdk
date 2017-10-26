@@ -1,7 +1,7 @@
 const SimpleDB = require('../dynamodb');
 const expect = require('chai').expect;
 
-describe('DynamodDB Query Operation', () => {
+describe('DynamoDB Query Operation', () => {
     describe('Primary Key', () => {
         it('Primary Key', () => {
             let db = new SimpleDB({ dummy: 'dummy' });
