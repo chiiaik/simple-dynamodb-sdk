@@ -8,7 +8,6 @@ function primaryKey(keyName, value) {
     if (_.isNil(value)) {
         this.equal = (val) => {
             this._primaryKey = { name: keyName, value: val };
-            return this;
         }
         return this;
     }
@@ -20,8 +19,7 @@ function primaryKey(keyName, value) {
 function sortKey(keyName, value) {
     if (_.isNil(value)) {
         this.equal = (val) => {
-            this._sortKey = { name: keyName, value: val }
-            return this;
+            this._sortKey = { name: keyName, val }
         }
         return this;
     }
@@ -31,9 +29,9 @@ function sortKey(keyName, value) {
 }
 
 
-function _makeGetParams(self) {
+function _makeParams(self) {
     let params = common.makeParams(self);
-
+    
     if (self._primaryKey) {
         params.Key = {}
         params.Key[self._primaryKey.name] = self._primaryKey.value;
@@ -51,12 +49,12 @@ function _makeGetParams(self) {
 }
 
 function run() {
-    let params = _makeGetParams(this);
+    let params = _makeParams(this);
     return this._db.get(params);
 }
 
 function dryRun() {
-    let params = _makeGetParams(this);
+    let params = _makeParams(this);
     // console.log(params);    
     return Promise.resolve(params);    
 }

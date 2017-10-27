@@ -302,10 +302,11 @@ describe('DynamodDB Common Operation', () => {
             return db.query()
                 .tableName('MyTable')
                 .primaryKey('userId').equal('abc')
-                .sortKey('createdTime', 123, '=')
+                .sortKey('createdTime').equal(123)
                 .select(['a','b','c'])
                 .dryRun()
                 .then(params => {
+                    console.log(params);
                     expect(params.TableName).to.be.equal('MyTable');
                     expect(params.KeyConditionExpression).to.be.equal('userId = :userId AND createdTime = :createdTime');
                     expect(params.ExpressionAttributeValues).to.deep.equal({ ':userId': 'abc', ':createdTime': 123 });

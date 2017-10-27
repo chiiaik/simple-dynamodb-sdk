@@ -12,10 +12,10 @@ function keyConditionExpression(attributes, joinCondition) {
         jc = this._joinCondition;
     }
     
-    let result = common.makeConditionExpression(this, attributes, jc, this._keyConditionExpression, this._attributeValues);
+    let result = common.makeConditionExpression(this, attributes, jc, this._paramKeyConditionExpression, this._paramExpressionAttributeValues);
     
-    this._keyConditionExpression = result.conditionExpression;
-    this._attributeValues = result.attributeValues;
+    this._paramKeyConditionExpression = result.conditionExpression;
+    this._paramExpressionAttributeValues = result.attributeValues;
 
     return this;
 }
@@ -49,7 +49,7 @@ function sortKey(keyName, value, comparator, func) {
     this.greaterThan = (value) => _sortKey(this, keyName, value, '>');
     this.lessThanOrEqual = (value) => _sortKey(this, keyName, value, '<=');
     this.greaterThanOrEqual = (value) => _sortKey(this, keyName, value, '>=');
-    this.between = (lower, upper) => _sortKey(this, keyName, [lower, upper], BETWEEN);
+    this.between = (lower, upper) => _sortKey(this, keyName, [lower, upper], 'BETWEEN');
     this.beginsWith = (prefix) => _sortKey(this, keyName, prefix, null, 'begins_with');
         
     return this;
@@ -88,7 +88,7 @@ function sortKeyBeginsWith(keyName, prefix) {
 }
 
 function _sortKey(self, keyName, value, comparator, func) {
-    if (_.isEmpty(self._keyConditionExpression)) {
+    if (_.isEmpty(self._paramKeyConditionExpression)) {
         throw new Error('please specify the primary key first');
     }
 
@@ -115,9 +115,9 @@ function _sortKey(self, keyName, value, comparator, func) {
         }
 
         let attributes = { name: keyName, values: value, operator: operator }
-        let result = common.makeConditionExpression(self, attributes, 'AND', self._keyConditionExpression, self._attributeValues);
-        self._keyConditionExpression = result.conditionExpression;
-        self._attributeValues = result.attributeValues;
+        let result = common.makeConditionExpression(self, attributes, 'AND', self._paramKeyConditionExpression, self._paramAttributeValues);
+        self._paramKeyConditionExpression = result.conditionExpression;
+        self._paramAttributeValues = result.attributeValues;
         
         return self;
     }
@@ -145,8 +145,8 @@ function descendingOrder() {
 function _makeQueryParams(self) {
     let params = common.makeParams(self);
 
-    if (self._keyConditionExpression) {
-        params.KeyConditionExpression = self._keyConditionExpression;
+    if (self._paramKeyConditionExpression) {
+        params.KeyConditionExpression = self._paramKeyConditionExpression;
     }    
 
     if (!_.isNil(self._paramScanIndexForward)) {
