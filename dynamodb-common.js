@@ -189,10 +189,10 @@ function filterExpression(attributes, joinCondition) {
         jc = 'AND';
     }
     
-    let result = makeConditionExpression(this, attributes, jc, this._paramFilterExpression, this._attributeValues);
+    let result = makeConditionExpression(this, attributes, jc, this._paramFilterExpression, this._paramExpressionAttributeValues);
     
     this._paramFilterExpression = result.conditionExpression;
-    this._attributeValues = result.attributeValues;
+    this._paramExpressionAttributeValues = result.attributeValues;
 
     return this;
 }
@@ -213,10 +213,34 @@ function conditionExpression(attributes, joinCondition) {
         jc = 'AND';
     }
     
-    let result = makeConditionExpression(this, attributes, jc, this._paramConditionExpression, this._attributeValues);
+    let result = makeConditionExpression(this, attributes, jc, this._paramConditionExpression, this._paramExpressionAttributeValues);
     
     this._paramConditionExpression = result.conditionExpression;
-    this._attributeValues = result.attributeValues;
+    this._paramExpressionAttributeValues = result.attributeValues;
+
+    return this;
+}
+
+/**
+ * Specify the fileter expression
+ * @param {array} attributes Array of expression attributes, e.g. { name: 'userId', value: '123', condition: '='}
+ * @param {string} joinOperator If multiple attributes are present, join operator is required ['AND'|'OR']
+ */
+function updateExpression(attributes, joinCondition) {
+    
+    let jc = joinCondition;
+    if (_.isEmpty(jc)) {
+        jc = this._joinCondition;
+    }
+
+    if (_.isEmpty(jc)) {
+        jc = 'AND';
+    }
+    
+    // let result = makeConditionExpression(this, attributes, jc, this._paramUpdateExpression, this._paramExpressionAttributeValues);
+    
+    // this._paramUpdateExpression = result.conditionExpression;
+    // this._paramExpressionAttributeValues = result.attributeValues;
 
     return this;
 }
@@ -438,8 +462,8 @@ function makeParams(self) {
     //     params.ExpressionAttributeNames = self._attributeNames;
     // }    
 
-    if (self._attributeValues) {
-        params.ExpressionAttributeValues = self._attributeValues;
+    if (self._paramExpressionAttributeValues) {
+        params.ExpressionAttributeValues = self._paramExpressionAttributeValues;
     }    
 
     if (self._paramProjectionExpression) {
@@ -452,6 +476,10 @@ function makeParams(self) {
 
     if (self._paramFilterExpression) {
         params.FilterExpression = self._paramFilterExpression;
+    }
+
+    if (self._paramUpdateExpression) {
+        params.UpdateExpression = self._paramUpdateExpression;    
     }
 
     if (!_.isNil(self._consistentRead)) {
@@ -485,6 +513,7 @@ module.exports = {
     select: projectionExpression, 
     projection: projectionExpression,
     condition: conditionExpression,
+    updateExpression,
     makeAttributeContainsExpression,
     makeAttributeExistsOrNotExistsExpression,
     makeAttributeSizeExpression,
