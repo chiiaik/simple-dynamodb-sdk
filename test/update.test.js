@@ -133,7 +133,7 @@ describe('DynamoDB Update Operation', () => {
         return db.update()
             .tableName('ProductCatalog')
             .primaryKey('Id').equal(123)
-            .del().attribute('Color').values(['Yellow','Purple'])
+            .delete().attribute('Color').values(['Yellow','Purple'])
             .dryRun()
             .then(params => {
                 expect(params.TableName).to.be.equal('ProductCatalog');

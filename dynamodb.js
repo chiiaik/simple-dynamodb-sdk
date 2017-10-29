@@ -4,6 +4,7 @@ const dbget = require('./dynamodb-get');
 const dbscan = require('./dynamodb-scan');
 const dbput = require('./dynamodb-put');
 const dbupdate = require('./dynamodb-update');
+const dbdelete = require('./dynamodb-delete');
 const common = require('./dynamodb-common');
 const _ = require('lodash');
 
@@ -49,6 +50,14 @@ function update() {
     return retval;
 }
 
+function _delete() {
+    let retval = {};
+    Object.assign(retval, common);
+    Object.assign(retval, dbdelete);
+    retval._db = new DynamoDBHelper(this.config);
+    return retval;
+}
+
 function DynamoDB(config) {
     if (_.isEmpty(config)) {
         throw new Error('missing config');
@@ -63,5 +72,7 @@ DynamoDB.prototype = {
     put,
     update
 }
+
+DynamoDB.prototype['delete'] = _delete;
 
 module.exports = DynamoDB;

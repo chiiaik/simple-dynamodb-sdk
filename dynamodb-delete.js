@@ -50,7 +50,7 @@ function _makeParams(self) {
 
 function run() {
     let params = _makeParams(this);
-    return this._db.get(params);
+    return this._db.remove(params);
 }
 
 function dryRun() {

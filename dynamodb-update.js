@@ -126,7 +126,7 @@ function add() {
     return this;
 }
 
-function del() {
+function _delete() {
     this.attribute = (name) => {
         if (!this._paramUpdateDeleteAttributeNames) {
             this._paramUpdateDeleteAttributeNames = [];
@@ -315,7 +315,7 @@ function _makeParams(self) {
 
 function run() {
     let params = _makeParams(this);
-    return this._db.scan(params);
+    return this._db.update(params);
 }
 
 function dryRun() {
@@ -330,8 +330,9 @@ module.exports = {
     set,
     remove,
     add,
-    del,
     where,
     run,
     dryRun
 }
+
+module.exports['delete'] = _delete;
