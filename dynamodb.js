@@ -2,6 +2,7 @@ const DynamoDBHelper = require('dynamodb-helper');
 const dbquery = require('./dynamodb-query');
 const dbget = require('./dynamodb-get');
 const dbbatchget = require('./dynamodb-batch-get');
+const dbbatchwrite = require('./dynamodb-batch-write');
 const dbscan = require('./dynamodb-scan');
 const dbput = require('./dynamodb-put');
 const dbupdate = require('./dynamodb-update');
@@ -11,8 +12,17 @@ const _ = require('lodash');
 
 function batchGet() {
     let retval = {};
-    Object.assign(retval, common);
+    // Object.assign(retval, common);
     Object.assign(retval, dbbatchget);
+    retval._db = new DynamoDBHelper(this.config);
+    return retval;
+    
+}
+
+function batchWrite() {
+    let retval = {};
+    // Object.assign(retval, common);
+    Object.assign(retval, dbbatchwrite);
     retval._db = new DynamoDBHelper(this.config);
     return retval;
     
@@ -80,7 +90,8 @@ DynamoDB.prototype = {
     scan,
     put,
     update,
-    batchGet
+    batchGet,
+    batchWrite
 }
 
 DynamoDB.prototype['delete'] = _delete;

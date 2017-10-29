@@ -17,9 +17,39 @@ describe('DynamoDB Batch Get Operation', () => {
             .returnConsumedCapacity('TOTAL')
             .dryRun()
             .then(params => {
-                console.log(JSON.stringify(params, null, 2));
-                // expect(params.TableName).to.be.equal('MyTable');
-                // expect(params.Key).to.deep.equal({ userId: 123, timestamp: 456 });
+                expect(params).to.deep.equal({
+                    RequestItems: {
+                        MyTable1: {
+                            Keys: [
+                                {
+                                    userId: 'aaa',
+                                    timestamp: 111
+                                },
+                                {
+                                    userId: 'bbb',
+                                    timestamp: 222
+                                }
+                            ],
+                            ProjectionExpression: 'a,b,c'
+                        },
+                        MyTable2: {
+                            Keys: [
+                                {
+                                    userId: 'ccc',
+                                    timestamp: 333
+                                },
+                                {
+                                    userId: 'ddd',
+                                    timestamp: 444
+                                }
+                            ],
+                            ProjectionExpression: 'd,e,f',
+                            ConsistentRead: true
+                        },
+                    },
+                    ReturnConsumedCapacity: 'TOTAL'
+                });
+               
             });
     });
 });
