@@ -298,7 +298,7 @@ function isConsistentRead() {
  * ReturnConsumedCapacity param
  * @param {String} value 'INDEXES' | 'TOTAL' | 'NONE'
  */
-function returnedConsumedCapacity(value) {
+function returnConsumedCapacity(value) {
     this._returnedConsumedCapacity = value;
     return this;
 }
@@ -527,7 +527,7 @@ module.exports = {
     and,
     or,
     isConsistentRead,
-    returnedConsumedCapacity,
+    returnConsumedCapacity,
 
     /* Attribute Filters */
     attribute,
