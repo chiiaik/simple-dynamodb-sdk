@@ -52,4 +52,37 @@ describe('DynamoDB Batch Get Operation', () => {
                
             });
     });
+
+    it('Array', () => {
+        let db = new SimpleDB({ dummy: 'dummy' });
+        return db.batchGet()
+            .tableName('MyTable1')
+            .keys([{ userId: 'aaa', timestamp: 111},{ userId: 'bbb', timestamp: 222}])
+            .projectionExpression('a,b,c')
+            .isConsistentRead()
+            .returnConsumedCapacity('TOTAL')
+            .dryRun()
+            .then(params => {
+                expect(params).to.deep.equal({
+                    RequestItems: {
+                        MyTable1: {
+                            Keys: [
+                                {
+                                    userId: 'aaa',
+                                    timestamp: 111
+                                },
+                                {
+                                    userId: 'bbb',
+                                    timestamp: 222
+                                }
+                            ],
+                            ProjectionExpression: 'a,b,c',
+                            ConsistentRead: true
+                        },
+                    },
+                    ReturnConsumedCapacity: 'TOTAL'
+                });
+               
+            });
+    });
 });

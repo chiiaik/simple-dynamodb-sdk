@@ -10,50 +10,57 @@ function tableName(name) {
     let requestItem = {}
     this._paramRequestItems[name] = requestItem;
 
-    this.primaryKey = (keyName, value) => _primaryKey(this, name, keyName, value);
+    this.primaryKey = (keyName, value) => _primaryKey(this, requestItem, keyName, value);
+    this.keys = (values) => _keys(this, requestItem, values);
     return this;
 }
 
+function _keys(self, requestItem, values) {
+    if (!requestItem.Keys) {
+        requestItem.Keys = []
+    }
+
+    values.forEach(value => {
+        requestItem.Keys.push(value);
+    });
+
+    self.projectionExpression = (attributes) => projectionExpression(self, requestItem, attributes);
+    self.isConsistentRead = () => isConsistentRead(self, requestItem);
+    return self;
+}
 /**
  * Get Operations
  */
-function _primaryKey(self, tableName, keyName, value) {
+function _primaryKey(self, requestItem, keyName, value) {
     if (_.isNil(value)) {
         self.equal = (val) => {
 
-            if (!self._paramRequestItems[tableName]) {
-                self._paramRequestItems[tableName] = {}
-            }
-            
-            if (!self._paramRequestItems[tableName].Keys) {
-                self._paramRequestItems[tableName].Keys = []
+            if (!requestItem.Keys) {
+                requestItem.Keys = []
             }
         
             let keysObject = {};
             keysObject[keyName] = val;
-            self._paramRequestItems[tableName].Keys.push(keysObject)
+            requestItem.Keys.push(keysObject)
             self.sortKey = (keyName, value) => _sortKey(self, keysObject, keyName);
-            self.projectionExpression = (attributes) => projectionExpression(self, self._paramRequestItems[tableName], attributes);
-            self.isConsistentRead = () => isConsistentRead(self, self._paramRequestItems[tableName]);
+            self.projectionExpression = (attributes) => projectionExpression(self, requestItem, attributes);
+            self.isConsistentRead = () => isConsistentRead(self, requestItem);
             return self;
         }
         return self;
     }
 
-    if (!self._paramRequestItems[tableName]) {
-        self._paramRequestItems[tableName] = {}
-    }
 
-    if (!self._paramRequestItems[tableName].Keys) {
-        self._paramRequestItems[tableName].Keys = [];
+    if (!requestItem.Keys) {
+        requestItem.Keys = [];
     }
 
     let keysObject = {};
     keysObject[keyName] = val;
-    self._paramRequestItems[tableName].Keys.push(keysObject)
+    requestItem.Keys.push(keysObject)
     self.sortKey = (keyName, value) => _sortKey(self, keysObject, keyName);
-    self.projectionExpression = (attributes) => projectionExpression(self, self._paramRequestItems[tableName], attributes);
-    self.isConsistentRead = () => isConsistentRead(self, self._paramRequestItems[tableName]);
+    self.projectionExpression = (attributes) => projectionExpression(self, requestItem, attributes);
+    self.isConsistentRead = () => isConsistentRead(self, requestItem);
     return self;
 }
 
