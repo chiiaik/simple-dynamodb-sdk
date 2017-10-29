@@ -24,7 +24,7 @@ function _makeParams(self) {
 
 function run() {
     let params = _makeParams(this);
-    return this._db.scan(params);
+    return this._db.put(params);
 }
 
 function dryRun() {
