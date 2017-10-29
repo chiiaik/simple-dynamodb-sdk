@@ -10,25 +10,45 @@ function tableName(name) {
     let requestItem = [];
     this._paramRequestItems[name] = requestItem;
 
-    this['delete'] = () => _delete(this, requestItem);
-    this.put = () => put(this, requestItem);
+    this['delete'] = (values) => _delete(this, requestItem, values);
+    this.put = (values) => put(this, requestItem, values);
     return this;
 }
 
-function _delete(self, requestItem) {
+function _delete(self, requestItem, values) {
+    if (_.isArray(values)) {
+        values.forEach((value => {
+            requestItem.push({ DeleteRequest: value });            
+        }));
+        return self;
+    }
+
     let deleteRequest = {};
     requestItem.push({ DeleteRequest: deleteRequest });
     self.primaryKey = (keyName) => _primaryKey(self, deleteRequest, keyName);
     return self;
 }
 
-function put(self, requestItem) {
+function put(self, requestItem, values) {
+    if (_.isArray(values)) {
+        values.forEach((value => {
+            let item = {};
+            Object.assign(item, value);
+            let putRequest = { Item: item }
+            requestItem.push({ PutRequest: putRequest });            
+        }));
+        return self;
+    }
     let item = {};
     let putRequest = { Item: item };
     requestItem.push({ PutRequest: putRequest });
     self.primaryKey = (keyName) => _attribute(self, item, keyName);
     self.attribute = (name) => _attribute(self, item, name);
     return self;
+}
+
+function _primaryKeys(self, parent, keysAndValues) {
+
 }
 
 function _primaryKey(self, parent, keyName) {

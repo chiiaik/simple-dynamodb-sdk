@@ -32,4 +32,20 @@ describe('DynamoDB Batch Write Operation', () => {
                 // expect(params.Key).to.deep.equal({ userId: 123, timestamp: 456 });
             });
     });
+
+    it('Array', () => {
+        let db = new SimpleDB({ dummy: 'dummy' });
+        return db.batchWrite()
+            .tableName('MyTable1')
+            .delete([{ userId: 'aaa' }, { userId: 'bbb' }])
+            .put([{ userId: 'ccc', name: 'Alice' }, { userId: 'ddd', name: 'Bob' }])
+            .returnConsumedCapacity('TOTAL')
+            .returnItemCollectionMetricsSize()
+            .dryRun()
+            .then(params => {
+                console.log(JSON.stringify(params, null, 2));
+                // expect(params.TableName).to.be.equal('MyTable');
+                // expect(params.Key).to.deep.equal({ userId: 123, timestamp: 456 });
+            });
+    });
 });
