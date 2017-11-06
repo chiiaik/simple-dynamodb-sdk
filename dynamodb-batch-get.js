@@ -137,7 +137,7 @@ function _makeParams(self) {
 
 function run() {
     let params = _makeParams(this);
-    return this._db.remove(params);
+    return this._db.batchGet(params);
 }
 
 function dryRun() {
