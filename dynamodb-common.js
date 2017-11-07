@@ -528,6 +528,7 @@ module.exports = {
     or,
     isConsistentRead,
     returnConsumedCapacity,
+    limit,
 
     /* Attribute Filters */
     attribute,
